@@ -1,0 +1,39 @@
+ABOUT
+
+  If you want to write a bunch of little shell script functions as tests,
+  run them all and see which ones passed or failed, this makes it easy.
+
+USAGE
+
+  Copy test.sh to your project and make some tests.
+  Write some shell script functions.
+  Add the names of the functions to a global variable 'ext_tests'.
+  Put the functions and variable in a file and pass it to test.sh.
+  The functions get called, and pass/fail is determined by their return status.
+  The results are all reported at the end.
+  
+  That's it.
+
+FEATURES
+
+  If there's an environment variable TESTSH_ENVRC defined, that file is loaded
+  into test.sh before any tests are run, and all variables are exported. If 
+  TESTSH_ENVRC doesn't exist, the file .testshrc is loaded from the directory
+  pointed to from environment variable TESTSH_SRCDIR (which defaults to
+  environment variable PWD, or the current directory).
+  
+  The variable 'base_name' is available to the test functions as the file name
+  of the test, minus the extension ".t".
+
+  The variable 'tmpdir' is available to the test functions. It is a new temporary
+  directory created right before each test file is loaded, and removed after the
+  file's tests run.
+
+  Set environment variable DEBUG=1 before running test.sh to enable shell tracing.
+
+EXTRA
+
+  There is a collection of Makefiles in this project. You don't need to use them,
+  but they show one way to call tests in subdirectories from your project.
+  Or you could go minimal, like: find . -type f -name *.t -exec ./test.sh {} \;
+
