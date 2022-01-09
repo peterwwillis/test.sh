@@ -34,20 +34,21 @@ set -u
 
 PWD="${PWD:-$(pwd)}"
 TESTSH_SRCDIR="${TESTSH_SRCDIR:-$PWD}"
-TESTSH_SRCDIR="$(cd "$(dirname "$TESTSH_SRCDIR")" && pwd -P)"
+TESTSH_SRCDIR="$(cd "$TESTSH_SRCDIR" && pwd -P)"
 TESTSH_LOGGING="${TESTSH_LOGGING:-0}"
 TESTSH_ENVRC="${TESTSH_ENVRC:-$TESTSH_SRCDIR/.testshrc}"
+TESTSH_TESTEXT="${TESTSH_TESTEXT:-.t}"
 
 _main () {
     _fail=0 _pass=0 _failedtests=""
-    testsh_pwd="$(pwd)"
+    testshpwd="$(pwd)"
 
     for i in "$@" ; do
 
-        cd "$testsh_pwd" || { echo "$0: Error: could not cd '$testsh_pwd'" && exit 1 ; }
+        cd "$testshpwd" || { echo "$0: Error: could not cd '$testshpwd'" && exit 1 ; }
 
         # The following variables should be used by the tests
-        testbasename="$(basename "$i" .t)"  ### So you don't need ${BASH_SOURCE[0]}
+        testbasename="$(basename "$i" "$TESTSH_TESTEXT")"  ### So you don't need ${BASH_SOURCE[0]}
         testtmpdir="$(mktemp -d)"            ### Copy your test files into here
 
         # Terrible, horrible, no good kludge to add a path to $i
@@ -59,13 +60,14 @@ _main () {
         # The value is a string of space-separated names of '_t_SOMETHING' functions to run.
         __fail=0 __pass=0
         for t in $ext_tests ; do
-            cd "$testsh_pwd" || { echo "$0: Error: could not cd '$testsh_pwd'" && exit 1 ; }
+            cd "$testshpwd" || { echo "$0: Error: could not cd '$testshpwd'" && exit 1 ; }
             echo "$0: Running test '$t'"
 
             command -v _testsh_pre_test >/dev/null 2>&1 && _testsh_pre_test "$t"
             if    [ "${TESTSH_LOGGING:-0}" = "1" ] ; then
-                echo "$0: Logging to file '$testsh_pwd/test_$t.log'"
-                "_t_$t" > "test_$t.log" 2>&1 ; ret=$?
+                testshlogfile="$testshpwd/test_${testbasename}_${t}.log"
+                echo "$0: Logging to file '$testshlogfile'"
+                "_t_$t" > "$testshlogfile" 2>&1 ; ret=$?
             else
                 "_t_$t" ; ret=$?
             fi
@@ -78,6 +80,9 @@ _main () {
             else
                 echo "$0: $testbasename: Test $t succeeded"
                 __pass=$((__pass+1))
+                if [ "${TESTSH_LOGGING:-0}" = "1" ] && [ ! "${TESTSH_LOGGING_KEEP_SUCCESS:-0}" = "1" ] ; then
+                    rm -f "$testshlogfile"
+                fi
             fi
         done
 

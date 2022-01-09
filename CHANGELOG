@@ -6,6 +6,7 @@ Version 0.2
 
  - Change variable 'base_name' to 'testbasename'
  - Change variable 'tmpdir' to 'testtmpdir'
+ - Change variable 'testsh_pwd' to 'testshpwd'
 
  - Fix building, linting
  - Fix TESTSH_SRCDIR to point to the right place

@@ -36,12 +36,16 @@ FEATURES
   are run before and after each test.
 
   Set environment variable TESTSH_LOGGING=1 to redirect each test's output to
-  its own log file.
+  its own log file. Successful test logs are automatically deleted unless
+  you set 'TESTSH_LOGGING_KEEP_SUCCESS=1'.
 
   Set environment variable TESTSH_ENVRC to a shell script to be loaded by test.sh
   at start time. All variables in said script are exported.
   If TESTSH_ENVRC doesn't exist, the file .testshrc is loaded from TESTSH_SRCDIR
   (which defaults to $PWD or `pwd`).
+
+  You can change the default extension of tests ('.t') by setting environment
+  variable TESTSH_TESTEXT.
   
   Set environment variable DEBUG=1 before running test.sh to enable shell tracing.
 
