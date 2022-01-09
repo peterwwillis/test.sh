@@ -5,6 +5,8 @@ ABOUT
 
 COMPILING
 
+  Install 'm4' and 'shellcheck'.
+
   Run `make clean all`.
 
 INSTALLING
