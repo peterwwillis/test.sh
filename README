@@ -32,6 +32,9 @@ FEATURES
   directory created right before each test file is loaded, and removed after the
   file's tests run.
 
+  If a function or command '_testsh_pre_test' or '_testsh_post_test' exist, they
+  are run before and after each test.
+
   Set environment variable TESTSH_LOGGING=1 to redirect each test's output to
   its own log file.
 

@@ -2,6 +2,7 @@ Version 0.2
 
  - Add TESTSH_LOGGING variable; if set to '1', each test outputs to its own log
    file so you can see the results of each test.
+ - Add optional _testsh_pre_test and _testsh_post_test functions
 
  - Change variable 'base_name' to 'testbasename'
  - Change variable 'tmpdir' to 'testtmpdir'

@@ -62,12 +62,14 @@ _main () {
             cd "$testsh_pwd" || { echo "$0: Error: could not cd '$testsh_pwd'" && exit 1 ; }
             echo "$0: Running test '$t'"
 
+            command -v _testsh_pre_test >/dev/null 2>&1 && _testsh_pre_test "$t"
             if    [ "${TESTSH_LOGGING:-0}" = "1" ] ; then
                 echo "$0: Logging to file '$testsh_pwd/test_$t.log'"
                 "_t_$t" > "test_$t.log" 2>&1 ; ret=$?
             else
                 "_t_$t" ; ret=$?
             fi
+            command -v _testsh_post_test >/dev/null 2>&1 && _testsh_post_test "$t"
 
             if [ $ret -ne 0 ] ; then
                 echo "$0: $testbasename: Test $t failed"
