@@ -6,3 +6,6 @@ disable=SC1090
 
 # ext_tests is referenced but not assigned.
 disable=SC2154
+
+# Check exit code directly
+disable=SC2181

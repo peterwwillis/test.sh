@@ -21,33 +21,23 @@
 # SOFTWARE.
 
 [ "${DEBUG:-0}" = "1" ] && set -x
-TESTSH_VERSION=0.1
+TESTSH_VERSION=0.2
 set -u
 
-### How this thing works:
+### How to use test.sh:
+### 
 ###  1. Create some shell scripts in tests/ directory, filename ending with '.t'
 ###  2. Define some functions ('_t_NAME') in that shell script
-###     a. Put the space-separated NAMEs in $ext_tests
+###     a. Put the space-separated NAMEs in global variable $ext_tests
 ###     b. Register test pass/fail with 'return 0' / 'return 1'
 ###  3. Run `./test.sh tests/*.t`
 
-# Define some common tests here
-#_t_something () {
-#}
-
-##############################################################################
-# Don't modify anything after here
-
 PWD="${PWD:-$(pwd)}"
 TESTSH_SRCDIR="${TESTSH_SRCDIR:-$PWD}"
-TESTSH_SRCDIR="$(cd "$(dirname "$0")" && pwd -P)"
-
-# Configuration file
+TESTSH_SRCDIR="$(cd "$(dirname "$TESTSH_SRCDIR")" && pwd -P)"
+TESTSH_LOGGING="${TESTSH_LOGGING:-0}"
 TESTSH_ENVRC="${TESTSH_ENVRC:-$TESTSH_SRCDIR/.testshrc}"
 
-### _main() - run the tests
-### Arguments:
-###     TESTPATH        -   A file path ending with '.t'
 _main () {
     _fail=0 _pass=0 _failedtests=""
     testsh_pwd="$(pwd)"
@@ -56,9 +46,9 @@ _main () {
 
         cd "$testsh_pwd" || { echo "$0: Error: could not cd '$testsh_pwd'" && exit 1 ; }
 
-        # The following variables should be used by *.t scripts
-        base_name="$(basename "$i" .t)"  ### So you don't need ${BASH_SOURCE[0]}
-        tmpdir="$(mktemp -d)"            ### Copy your test files into here
+        # The following variables should be used by the tests
+        testbasename="$(basename "$i" .t)"  ### So you don't need ${BASH_SOURCE[0]}
+        testtmpdir="$(mktemp -d)"            ### Copy your test files into here
 
         # Terrible, horrible, no good kludge to add a path to $i
         [ "$(expr "$i" : '.*/')" = 0 ] && i="$(cd "$(dirname "$i")" && pwd -P)/$i"
@@ -69,24 +59,34 @@ _main () {
         # The value is a string of space-separated names of '_t_SOMETHING' functions to run.
         __fail=0 __pass=0
         for t in $ext_tests ; do
-            if ! "_t_$t" ; then
-                echo "$0: $base_name: Test $t failed"
-                __fail=$((__fail+1))
-                _failedtests="$_failedtests $base_name:$t"
+            cd "$testsh_pwd" || { echo "$0: Error: could not cd '$testsh_pwd'" && exit 1 ; }
+            echo "$0: Running test '$t'"
+
+            if    [ "${TESTSH_LOGGING:-0}" = "1" ] ; then
+                echo "$0: Logging to file '$testsh_pwd/test_$t.log'"
+                "_t_$t" > "test_$t.log" 2>&1 ; ret=$?
             else
-                echo "$0: $base_name: Test $t succeeded"
+                "_t_$t" ; ret=$?
+            fi
+
+            if [ $ret -ne 0 ] ; then
+                echo "$0: $testbasename: Test $t failed"
+                __fail=$((__fail+1))
+                _failedtests="$_failedtests $testbasename:$t"
+            else
+                echo "$0: $testbasename: Test $t succeeded"
                 __pass=$((__pass+1))
             fi
         done
 
-        rm -rf "$tmpdir"
-        [ $__fail -gt 0 ] && echo "$0: $base_name: Failed $__fail tests" && _fail="$((_fail+__fail))"
+        rm -rf "$testtmpdir"
+        [ $__fail -gt 0 ] && echo "$0: $testbasename: Failed $__fail tests" && _fail="$((_fail+__fail))"
         _pass=$((_pass+__pass))
 
     done
 }
 
-# Load config
+# Load config and export all variables
 if [ -n "${TESTSH_ENVRC:-}" ] && [ -r "${TESTSH_ENVRC:-}" ] ; then
     set -a ; . "$TESTSH_ENVRC" ; set +a
 fi
@@ -94,7 +94,8 @@ fi
 _main "$@"
 echo "$0: Passed $_pass tests"
 if [ $_fail -gt 0 ] ; then
-    echo "$0: Failed $_fail tests: $_failedtests"
+    echo "$0: Failed $_fail tests ($_failedtests)"
+    [ "${TESTSH_LOGGING:-0}" = "1" ] && echo "$0: Check log files for more details."
     exit 1
 fi
 

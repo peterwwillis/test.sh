@@ -57,6 +57,9 @@ install-default:
 %.sh: %.m4
 	m4 $(M4_ARGS) -P <'$<' >'$@'
 
+%.t:
+	@true
+
 test-default: lint-default
 	@ls *.t 2>/dev/null | while read TEST ; do test.sh $$TEST ; done
 	@set -e; if [ -n "$(SUBDIRS)" ] ; then for i in $(SUBDIRS) ; do make -C $$i test ; done ; fi

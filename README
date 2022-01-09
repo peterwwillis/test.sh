@@ -5,7 +5,7 @@ ABOUT
 
 COMPILING
 
-  Run `make`.
+  Run `make clean all`.
 
 INSTALLING
 
@@ -14,35 +14,38 @@ INSTALLING
 
 USAGE
 
-  Copy test.sh to your project and make some tests.
-  Write some shell script functions.
-  Add the names of the functions to a global variable 'ext_tests'.
-  Put the functions and variable in a file and pass it to test.sh.
-  The functions get called, and pass/fail is determined by their return status.
-  The results are all reported at the end.
-  
-  That's it.
+  1. Copy test.sh to your project and make some tests.
+  2. Write some shell script functions (these are your tests).
+  3. Add the names of the functions to a global variable called 'ext_tests'.
+  4. Put the variable and functions in a file ending with ".t" and pass it to 
+     `test.sh` (e.g. `test.sh some-file.t`).
+
+  The functions listed in 'ext_tests' get called, and pass/fail is determined
+  by their return status. The results are reported at the end.
 
 FEATURES
 
-  If there's an environment variable TESTSH_ENVRC defined, that file is loaded
-  into test.sh before any tests are run, and all variables are exported. If 
-  TESTSH_ENVRC doesn't exist, the file .testshrc is loaded from the directory
-  pointed to from environment variable TESTSH_SRCDIR (which defaults to
-  environment variable PWD, or the current directory).
-  
-  The variable 'base_name' is available to the test functions as the file name
+  The variable 'testbasename' is available to the test functions as the file name
   of the test, minus the extension ".t".
 
-  The variable 'tmpdir' is available to the test functions. It is a new temporary
+  The variable 'testtmpdir' is available to the test functions. It is a new temporary
   directory created right before each test file is loaded, and removed after the
   file's tests run.
 
+  Set environment variable TESTSH_LOGGING=1 to redirect each test's output to
+  its own log file.
+
+  Set environment variable TESTSH_ENVRC to a shell script to be loaded by test.sh
+  at start time. All variables in said script are exported.
+  If TESTSH_ENVRC doesn't exist, the file .testshrc is loaded from TESTSH_SRCDIR
+  (which defaults to $PWD or `pwd`).
+  
   Set environment variable DEBUG=1 before running test.sh to enable shell tracing.
 
-EXTRA
+NOTES
 
   There is a collection of Makefiles in this project. You don't need to use them,
-  but they show one way to call tests in subdirectories from your project.
-  Or you could go minimal, like: find . -type f -name *.t -exec ./test.sh {} \;
+  but they show a handy way to call tests in subdirectories of your project.
+  Or you could go minimalist:
+      find . -type f -name *.t -exec ./test.sh {} \;
 
