@@ -18,7 +18,7 @@ PREFIX ?= $(shell pwd)/_install/usr
 # Pass the above variables along to the rest of the Make processes
 export
 
-all: build-default
+all: build test lint done-build
 
 include ./makefile.inc
 
@@ -28,3 +28,7 @@ build: build-default
 lint: lint-default
 test: test-default
 install: install-default
+
+done-build:
+	@echo "Build succeeded!"
+	@echo "Run 'make install' or copy 'src/test.sh' to wherever you like."

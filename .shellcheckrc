@@ -1,0 +1,8 @@
+# TESTSH_VERSION appears unused.
+disable=SC2034
+
+# Can't follow non-constant source
+disable=SC1090
+
+# ext_tests is referenced but not assigned.
+disable=SC2154

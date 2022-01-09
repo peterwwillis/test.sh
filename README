@@ -3,6 +3,15 @@ ABOUT
   If you want to write a bunch of little shell script functions as tests,
   run them all and see which ones passed or failed, this makes it easy.
 
+COMPILING
+
+  Run `make`.
+
+INSTALLING
+
+  Run `make install`, or copy 'src/test.sh' to wherever you would like to
+  install it.
+
 USAGE
 
   Copy test.sh to your project and make some tests.

@@ -1,5 +1,5 @@
 SUBDIRS = 
-PROGRAMS = 
+PROGRAMS = test.sh
 
 include ../makefile.inc
 

@@ -35,9 +35,10 @@ all-default: $(PROGRAMS)
 
 build-default: $(PROGRAMS)
 	@set -e; if [ -n "$(SUBDIRS)" ] ; then for i in $(SUBDIRS) ; do make -C $$i build ; done ; fi
+	@for i in $(PROGRAMS) ; do chmod +x $$i ; done
 
 clean-default:
-	@for i in $(PROGRAMS) ; do rm -f "$$i" ; done
+	@for i in $(PROGRAMS) ; do rm -v -f "$$i" ; done
 	@set -e; if [ -n "$(SUBDIRS)" ] ; then for i in $(SUBDIRS) ; do make -C $$i clean ; done ; fi
 
 lint-default: $(PROGRAMS)

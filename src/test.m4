@@ -54,7 +54,7 @@ _main () {
 
     for i in "$@" ; do
 
-        cd "$testsh_pwd"
+        cd "$testsh_pwd" || { echo "$0: Error: could not cd '$testsh_pwd'" && exit 1 ; }
 
         # The following variables should be used by *.t scripts
         base_name="$(basename "$i" .t)"  ### So you don't need ${BASH_SOURCE[0]}
@@ -69,19 +69,19 @@ _main () {
         # The value is a string of space-separated names of '_t_SOMETHING' functions to run.
         __fail=0 __pass=0
         for t in $ext_tests ; do
-            if ! _t_$t ; then
+            if ! "_t_$t" ; then
                 echo "$0: $base_name: Test $t failed"
-                __fail=$(($__fail+1))
+                __fail=$((__fail+1))
                 _failedtests="$_failedtests $base_name:$t"
             else
                 echo "$0: $base_name: Test $t succeeded"
-                __pass=$(($__pass+1))
+                __pass=$((__pass+1))
             fi
         done
 
         rm -rf "$tmpdir"
-        [ $__fail -gt 0 ] && echo "$0: $base_name: Failed $__fail tests" && _fail="$(($_fail+$__fail))"
-        _pass=$(($_pass+$__pass))
+        [ $__fail -gt 0 ] && echo "$0: $base_name: Failed $__fail tests" && _fail="$((_fail+__fail))"
+        _pass=$((_pass+__pass))
 
     done
 }
@@ -97,3 +97,5 @@ if [ $_fail -gt 0 ] ; then
     echo "$0: Failed $_fail tests: $_failedtests"
     exit 1
 fi
+
+# vim: syntax=sh
